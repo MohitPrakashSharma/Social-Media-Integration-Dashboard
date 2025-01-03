@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/context/auth-context';
+import { useAuthAccess } from '@/lib/hooks/use-auth-access';
 import { TelegramUser } from '@/lib/types/auth';
 import { SocialDashboard } from '@/components/social/SocialDashboard';
 import { Shield, Loader2 } from 'lucide-react';
@@ -10,40 +11,29 @@ import { Shield, Loader2 } from 'lucide-react';
 export default function Home() {
   const searchParams = useSearchParams();
   const { login, user, isLoggingIn } = useAuth();
-  const [isValidating, setIsValidating] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { isValidating, error, hasAccess } = useAuthAccess();
 
   useEffect(() => {
-    const validateAccess = async () => {
+    const initializeUser = async () => {
       const userParam = searchParams.get('user');
-
-      if (!userParam && !user) {
-        setError('This URL is not publicly accessible. Please log in to access.');
-        setIsValidating(false);
-        return;
-      }
-
+      
       if (userParam && !user) {
         try {
           const jsonString = atob(userParam);
           const telegramUser: TelegramUser = JSON.parse(jsonString);
           
-          // Validate required fields
           if (!telegramUser.telegramId || !telegramUser.userName || !telegramUser.name) {
             throw new Error('Invalid user data');
           }
 
           await login(telegramUser);
         } catch (error) {
-          console.error('Access validation error:', error);
-          setError('Invalid access token. Please use a valid login link.');
+          console.error('User initialization error:', error);
         }
       }
-      
-      setIsValidating(false);
     };
 
-    validateAccess();
+    initializeUser();
   }, [searchParams, login, user]);
 
   if (isValidating || isLoggingIn) {

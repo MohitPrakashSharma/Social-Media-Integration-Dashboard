@@ -5,11 +5,11 @@ import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/context/auth-context';
 import { TelegramUser } from '@/lib/types/auth';
 import { SocialDashboard } from '@/components/social/SocialDashboard';
-import { Shield } from 'lucide-react';
+import { Shield, Loader2 } from 'lucide-react';
 
 export default function Home() {
   const searchParams = useSearchParams();
-  const { login, user } = useAuth();
+  const { login, user, isLoggingIn } = useAuth();
   const [isValidating, setIsValidating] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +23,7 @@ export default function Home() {
         return;
       }
 
-      if (userParam) {
+      if (userParam && !user) {
         try {
           const jsonString = atob(userParam);
           const telegramUser: TelegramUser = JSON.parse(jsonString);
@@ -46,10 +46,11 @@ export default function Home() {
     validateAccess();
   }, [searchParams, login, user]);
 
-  if (isValidating) {
+  if (isValidating || isLoggingIn) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-pulse">Validating access...</div>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-3">
+        <Loader2 className="w-6 h-6 animate-spin" />
+        <div>{isLoggingIn ? 'Logging in...' : 'Validating access...'}</div>
       </div>
     );
   }

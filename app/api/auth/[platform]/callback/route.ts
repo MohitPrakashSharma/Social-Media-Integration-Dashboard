@@ -81,11 +81,11 @@ export async function GET(
       cause: error.cause
     });
 
-    // return Response.redirect(
-    //   createRedirectUrl({
-    //     error: error.message || 'Authentication failed',
-    //     platform
-    //   })
-    // );
+    return Response.redirect(
+      createRedirectUrl({
+        error: error.message || 'Authentication failed',
+        platform
+      })
+    );
   }
 }

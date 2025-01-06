@@ -67,7 +67,7 @@ export async function GET(
     );
 
     // Store tokens and profile in cookies
-    const cookieStore = cookies();
+    const cookieStore = cookies(); 
     cookieStore.set(`${platform}_token`, tokens.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

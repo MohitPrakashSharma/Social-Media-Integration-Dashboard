@@ -18,8 +18,10 @@ export function SocialDashboard() {
 
 	useEffect(() => {
 		const success = searchParams.get('success');
+		console.log("🚀 ~ useEffect ~ success:", success)
 		const error = searchParams.get('error');
 		const platform = searchParams.get('platform');
+		console.log("🚀 ~ useEffect ~ platform:", platform)
 
 		if (success && platform) {
 			fetchProfile(platform as SocialAccount['platform']);
@@ -28,6 +30,7 @@ export function SocialDashboard() {
 				description: `Your ${platform} account has been connected.`,
 			});
 		} else if (error) {
+			console.log("🚀 ~ useEffect ~ error:", error)
 			toast({
 				title: 'Connection Failed',
 				description: error,

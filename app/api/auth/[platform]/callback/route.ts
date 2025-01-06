@@ -45,6 +45,7 @@ export async function GET(
       },
       body: tokenBody,
     });
+    console.log("🚀 ~ tokenResponse:", tokenResponse)
 
     if (!tokenResponse.ok) {
       const errorData = await tokenResponse.text();

@@ -1,5 +1,5 @@
 import { authConfig } from '@/lib/config/auth';
-import { SocialAccount } from '@/lib/types/social';
+import oauthConfigs from './oauth-config';
 
 interface TokenResponse {
   access_token: string;
@@ -12,47 +12,34 @@ export async function exchangeCodeForToken(
   code: string
 ): Promise<TokenResponse> {
   const config = authConfig[platform];
-  
-  // Base token request parameters
-  const tokenBody = new URLSearchParams({
-    client_id: config.clientId,
-    client_secret: config.clientSecret,
-    code,
-    grant_type: 'authorization_code',
-    redirect_uri: config.redirectUri,
-  });
+  const oauthConfig = oauthConfigs[platform];
 
-  // Platform-specific adjustments
-  switch (platform) {
-    case 'discord':
-      tokenBody.append('scope', config.scope.join(' '));
-      break;
-    case 'twitter':
-      // Twitter requires code_verifier for PKCE
-      tokenBody.append('code_verifier', 'challenge');
-      break;
-  }
+  try {
+    const response = await fetch(config.tokenUrl, {
+      method: 'POST',
+      headers: oauthConfig.getTokenRequestHeaders(),
+      body: oauthConfig.getTokenRequestParams(code),
+    });
 
-  const response = await fetch(config.tokenUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Accept: 'application/json',
-    },
-    body: tokenBody,
-  });
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`Token exchange failed: ${response.statusText}`, {
+        cause: {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+          platform,
+        },
+      });
+    }
 
-  if (!response.ok) {
-    const errorData = await response.text();
-    const error = new Error(`Token exchange failed: ${response.statusText}`);
-    error.cause = {
-      status: response.status,
-      statusText: response.statusText,
-      error: errorData,
+    return response.json();
+  } catch (error: any) {
+    console.error('Token exchange error:', {
       platform,
-    };
+      message: error.message,
+      cause: error.cause,
+    });
     throw error;
   }
-
-  return response.json();
 }

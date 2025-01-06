@@ -43,7 +43,9 @@ export function SocialDashboard() {
 	const fetchProfile = async (platform: SocialAccount['platform']) => {
 		try {
 			const response = await fetch(`/api/auth/${platform}/profile`);
+			console.log("🚀 ~ fetchProfile ~ response:", response)
 			const profile = await response.json();
+			console.log("🚀 ~ fetchProfile ~ profile:", profile)
 
 			if (profile) {
 				setAccounts((prev) => ({

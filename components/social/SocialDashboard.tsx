@@ -18,11 +18,11 @@ export function SocialDashboard() {
 
 	const searchParams = useSearchParams();
 	const { toast } = useToast();
+	const platform = searchParams.get('platform');
 
 	useEffect(() => {
 		const success = searchParams.get('success');
 		const error = searchParams.get('error');
-		const platform = searchParams.get('platform');
 
 		if (success && platform) {
 			fetchProfile(platform as SocialAccount['platform']);
@@ -51,7 +51,6 @@ export function SocialDashboard() {
 				variant: 'destructive',
 			});
 		}
-		const platform = "youtube"
 		if (code) {
 			(async () => {
 				try {

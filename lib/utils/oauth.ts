@@ -13,6 +13,7 @@ export async function exchangeCodeForToken(
 ): Promise<TokenResponse> {
   const config = authConfig[platform];
   const oauthConfig = oauthConfigs[platform];
+  console.log("🚀 ~ oauthConfig:", oauthConfig)
 
   try {
     const response = await fetch(config.tokenUrl, {
@@ -20,6 +21,7 @@ export async function exchangeCodeForToken(
       headers: oauthConfig.getTokenRequestHeaders(),
       body: oauthConfig.getTokenRequestParams(code),
     });
+    console.log("🚀 ~ response:", response)
 
     if (!response.ok) {
       const errorData = await response.text();

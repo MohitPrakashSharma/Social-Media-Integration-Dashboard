@@ -14,7 +14,7 @@ const oauthConfigs: Record<keyof typeof authConfig, OAuthConfig> = {
         grant_type: 'authorization_code',
         client_id: config.clientId,
         redirect_uri: config.redirectUri,
-        code_verifier: 'challenge', // In production, this should be properly generated and stored
+        code_verifier: 'challenge',  
       });
       return params;
     },

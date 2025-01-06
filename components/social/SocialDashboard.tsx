@@ -20,6 +20,7 @@ export function SocialDashboard() {
 		const success = searchParams.get('success');
 		console.log("🚀 ~ useEffect ~ success:", success)
 		const error = searchParams.get('error');
+		console.log("🚀 ~ useEffect ~ error:", error)
 		const platform = searchParams.get('platform');
 		console.log("🚀 ~ useEffect ~ platform:", platform)
 

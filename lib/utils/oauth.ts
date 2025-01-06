@@ -23,11 +23,12 @@ export async function exchangeCodeForToken(
 			headers: oauthConfig.getTokenRequestHeaders(),
 			body: oauthConfig.getTokenRequestParams(code),
 		});
-		console.log("🚀 ~ response:", response)
+		console.log("🚀 ~ response:", response.json())
 
 		if (!response.ok) {
 			console.log("🚀 ~ response:", response)
 			const errorData = await response.text();
+			console.log("🚀 ~ errorData:", errorData)
 			console.error('Token exchange error details:', {
 				status: response.status,
 				statusText: response.statusText,

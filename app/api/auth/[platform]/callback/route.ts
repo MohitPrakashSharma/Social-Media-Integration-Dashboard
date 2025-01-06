@@ -42,6 +42,7 @@ export async function GET(
       platform as keyof typeof authConfig,
       tokens.access_token
     );
+    console.log("🚀 ~ userProfile:", userProfile)
 
     // Store tokens and profile in cookies
     const cookieStore = cookies();
@@ -73,17 +74,18 @@ export async function GET(
     );
 
   } catch (error: any) {
+    console.log("🚀 ~ error:", error)
     console.error('Auth callback error:', {
       platform,
       message: error.message,
       cause: error.cause
     });
 
-    return Response.redirect(
-      createRedirectUrl({
-        error: error.message || 'Authentication failed',
-        platform
-      })
-    );
+    // return Response.redirect(
+    //   createRedirectUrl({
+    //     error: error.message || 'Authentication failed',
+    //     platform
+    //   })
+    // );
   }
 }

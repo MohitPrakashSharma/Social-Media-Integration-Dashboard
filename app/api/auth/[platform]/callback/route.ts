@@ -1,7 +1,10 @@
 import { NextRequest } from 'next/server';
+import { cookies } from 'next/headers';
 import { authConfig } from '@/lib/config/auth';
 import { fetchUserProfile } from '@/lib/utils/auth';
-import { cookies } from 'next/headers';
+import { exchangeCodeForToken } from '@/lib/utils/oauth';
+import { COOKIE_OPTIONS } from '@/lib/utils/cookies';
+import { createRedirectUrl } from '@/lib/utils/url';
 
 export async function GET(
   request: NextRequest,
@@ -14,4 +17,70 @@ export async function GET(
   const errorDescription = searchParams.get('error_description');
 
   if (error || !code) {
-    console.erro
+    console.error('OAuth error:', { error, errorDescription, platform });
+    return Response.redirect(
+      createRedirectUrl({ 
+        error: errorDescription || 'Authentication failed' 
+      })
+    );
+  }
+
+  try {
+    if (!Object.keys(authConfig).includes(platform)) {
+      throw new Error(`Unsupported platform: ${platform}`);
+    }
+
+    const tokens = await exchangeCodeForToken(
+      platform as keyof typeof authConfig,
+      code
+    );
+
+    const userProfile = await fetchUserProfile(
+      platform as keyof typeof authConfig,
+      tokens.access_token
+    );
+
+    // Store tokens and profile in cookies
+    const cookieStore = cookies();
+    
+    cookieStore.set(
+      `${platform}_token`,
+      tokens.access_token,
+      {
+        ...COOKIE_OPTIONS,
+        // If token has expiration, use it for cookie
+        ...(tokens.expires_in && {
+          maxAge: tokens.expires_in
+        })
+      }
+    );
+
+    cookieStore.set(
+      `${platform}_profile`,
+      JSON.stringify(userProfile),
+      COOKIE_OPTIONS
+    );
+
+    // Redirect back to the application with success status
+    return Response.redirect(
+      createRedirectUrl({
+        success: true,
+        platform
+      })
+    );
+
+  } catch (error: any) {
+    console.error('Auth callback error:', {
+      platform,
+      message: error.message,
+      cause: error.cause
+    });
+
+    return Response.redirect(
+      createRedirectUrl({
+        error: error.message || 'Authentication failed',
+        platform
+      })
+    );
+  }
+}

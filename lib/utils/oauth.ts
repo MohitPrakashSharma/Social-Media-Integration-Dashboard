@@ -14,7 +14,6 @@ export async function exchangeCodeForToken(
 	const config = authConfig[platform];
 	const oauthConfig = oauthConfigs[platform];
 	console.log("🚀 ~ oauthConfig:", oauthConfig)
-
 	try {
 		const response = await fetch(config.tokenUrl, {
 			method: 'POST',
@@ -22,8 +21,8 @@ export async function exchangeCodeForToken(
 			body: oauthConfig.getTokenRequestParams(code),
 		});
 		console.log("🚀 ~ response:", response)
-
 		if (!response.ok) {
+			console.log("🚀 ~ response:", response)
 			const errorData = await response.text();
 			throw new Error(`Token exchange failed: ${response.statusText}`, {
 				cause: {
@@ -34,7 +33,6 @@ export async function exchangeCodeForToken(
 				},
 			});
 		}
-
 		return response.json();
 	} catch (error: any) {
 		console.error('Token exchange error:', {

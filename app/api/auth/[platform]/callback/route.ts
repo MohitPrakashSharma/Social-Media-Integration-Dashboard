@@ -26,6 +26,8 @@ export async function GET(
   }
 
   try {
+    console.log("🚀 ~ authConfig:", authConfig)
+
     if (!Object.keys(authConfig).includes(platform)) {
       throw new Error(`Unsupported platform: ${platform}`);
     }
@@ -34,6 +36,7 @@ export async function GET(
       platform as keyof typeof authConfig,
       code
     );
+    console.log("🚀 ~ tokens:", tokens)
 
     const userProfile = await fetchUserProfile(
       platform as keyof typeof authConfig,

@@ -20,7 +20,6 @@ const oauthConfigs: Record<keyof typeof authConfig, OAuthConfig> = {
     },
     getTokenRequestHeaders: () => ({
       'Content-Type': 'application/x-www-form-urlencoded',
-      Accept: 'application/json',
       Authorization: `Basic ${Buffer.from(
         `${authConfig.twitter.clientId}:${authConfig.twitter.clientSecret}`
       ).toString('base64')}`,
@@ -35,12 +34,13 @@ const oauthConfigs: Record<keyof typeof authConfig, OAuthConfig> = {
         client_secret: config.clientSecret,
         redirect_uri: config.redirectUri,
         grant_type: 'authorization_code',
-        access_type: 'offline', // Add this for refresh token
+        access_type: 'offline',
       });
       return params;
     },
     getTokenRequestHeaders: () => ({
       'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: '*/*',
     }),
   },
   discord: {
@@ -57,6 +57,7 @@ const oauthConfigs: Record<keyof typeof authConfig, OAuthConfig> = {
     },
     getTokenRequestHeaders: () => ({
       'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: '*/*',
     }),
   },
 };

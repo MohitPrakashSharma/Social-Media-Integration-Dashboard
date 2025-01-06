@@ -22,25 +22,39 @@ export async function GET(
 
   try {
     const config = authConfig[platform as keyof typeof authConfig];
+    
+    // Prepare token request body based on platform
+    const tokenBody = new URLSearchParams({
+      client_id: config.clientId,
+      client_secret: config.clientSecret,
+      code,
+      grant_type: 'authorization_code',
+      redirect_uri: config.redirectUri,
+    });
+
+    // Add platform-specific parameters
+    if (platform === 'discord') {
+      tokenBody.append('scope', config.scope.join(' '));
+    }
+
     const tokenResponse = await fetch(config.tokenUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         Accept: 'application/json',
       },
-      body: new URLSearchParams({
-        client_id: config.clientId,
-        client_secret: config.clientSecret,
-        code,
-        grant_type: 'authorization_code',
-        redirect_uri: config.redirectUri,
-      }),
+      body: tokenBody,
     });
 
     if (!tokenResponse.ok) {
       const errorData = await tokenResponse.text();
-      console.error('Token exchange error:', errorData);
-      throw new Error('Failed to exchange code for token');
+      console.error('Token exchange error:', {
+        status: tokenResponse.status,
+        statusText: tokenResponse.statusText,
+        error: errorData,
+        platform,
+      });
+      throw new Error(`Token exchange failed: ${tokenResponse.statusText}`);
     }
 
     const tokens = await tokenResponse.json();
@@ -58,6 +72,7 @@ export async function GET(
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 1 week
+      path: '/',
     });
 
     cookieStore.set(`${platform}_profile`, JSON.stringify(userProfile), {
@@ -65,6 +80,7 @@ export async function GET(
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 1 week
+      path: '/',
     });
 
     return Response.redirect(

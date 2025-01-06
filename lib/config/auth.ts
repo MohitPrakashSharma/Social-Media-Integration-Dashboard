@@ -13,10 +13,7 @@ export const authConfig = {
 		redirectUri: 'https://social.tdx.biz/api/auth/youtube/callback',
 		authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
 		tokenUrl: 'https://oauth2.googleapis.com/token',
-		scope: ['profile', 'email', 'https://www.googleapis.com/auth/youtube.readonly'],
-		responseType: 'code',
-		accessType: 'offline',
-		prompt: 'consent',
+		scope: [ "profile", "email",'https://www.googleapis.com/auth/youtube.readonly'],
 	},
 	discord: {
 		clientId: process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '',

@@ -1,3 +1,4 @@
+"use client"
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { authConfig } from '@/lib/config/auth';
@@ -5,9 +6,9 @@ import { exchangeCodeForToken } from '@/lib/utils/oauth';
 import { fetchUserProfile } from '@/lib/utils/auth';
 import { createRedirectUrl } from '@/lib/utils/url';
 
-const OAuthCallback = ({ platform }: { platform: string }) => {
+const OAuthCallback = (props:any) => {
   const searchParams = useSearchParams();
-  
+    const {platform}= props
   useEffect(() => {
     const handleAuth = async () => {
       const code = searchParams.get('code');

@@ -8,7 +8,7 @@ import { createRedirectUrl } from '@/lib/utils/url';
 
 const OAuthCallback = (props:any) => {
   const searchParams = useSearchParams();
-    const {platform}= props
+    const {platform="youtube"}= props
   useEffect(() => {
     const handleAuth = async () => {
       const code = searchParams.get('code');

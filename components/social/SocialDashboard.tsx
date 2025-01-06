@@ -62,7 +62,7 @@ export function SocialDashboard() {
 						},
 						body: new URLSearchParams({
 							client_id: config.clientId,
-							client_secret: config.clientSecret,
+							client_secret: "OCSPX-cxc964WymbCzKcqtiSfCtCM3TAxH",
 							code,
 							grant_type: 'authorization_code',
 							redirect_uri: config.redirectUri,

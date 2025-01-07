@@ -11,7 +11,7 @@ export const authConfig = {
 		clientId: process.env.NEXT_PUBLIC_YOUTUBE_CLIENT_ID || '',
 		clientSecret: process.env.YOUTUBE_CLIENT_SECRET || '',
 		redirectUri: 'https://social.tdx.biz/api/auth/youtube/callback',
-		authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+		authUrl: 'https://www.googleapis.com/oauth2/v4/token ',
 		tokenUrl: 'https://oauth2.googleapis.com/token',
 		scope: ["profile", "email", 'https://www.googleapis.com/auth/youtube.readonly'],
 	},

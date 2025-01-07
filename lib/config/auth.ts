@@ -1,11 +1,11 @@
 export const authConfig = {
 	twitter: {
-		clientId: process.env.NEXT_PUBLIC_TWITTER_CLIENT_ID || '',
-		clientSecret: process.env.NEXT_TWITTER_CLIENT_SECRET || 'hd5hFlypdBXOKw0wTx2fEQDDKLezIz8qYSabktlB6Ei6M4OOwN',
+		clientId: process.env.NEXT_PUBLIC_TWITTER_CONSUMER_KEY || 'HaTwg5xZ3zxeFPdZJj1IaxX8s',
+		clientSecret: process.env.TWITTER_CONSUMER_SECRET || 'hd5hFlypdBXOKw0wTx2fEQDDKLezIz8qYSabktlB6Ei6M4OOwN',
 		redirectUri: 'https://social.tdx.biz/api/auth/twitter/callback',
-		authUrl: 'https://twitter.com/i/oauth2/authorize',
-		tokenUrl: 'https://api.twitter.com/2/oauth2/token',
-		scope: ['tweet.read', 'users.read'],
+		authUrl: 'https://api.twitter.com/oauth/authorize',
+		tokenUrl: 'https://api.twitter.com/oauth/access_token',
+		scope: ['tweet.read', 'users.read', 'offline.access'],
 	},
 	youtube: {
 		clientId: process.env.NEXT_PUBLIC_YOUTUBE_CLIENT_ID || '',
@@ -17,7 +17,7 @@ export const authConfig = {
 	},
 	discord: {
 		clientId: process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '',
-		clientSecret: process.env.NEXT_DISCORD_CLIENT_SECRET || 'hd5hFlypdBXOKw0wTx2fEQDDKLezIz8qYSabktlB6Ei6M4OOwN',
+		clientSecret: process.env.NEXT_DISCORD_CLIENT_SECRET || 'BVCPexjONnvtMIdD0sMntDrAmRUyxwS_',
 		redirectUri: 'https://social.tdx.biz/api/auth/discord/callback',
 		authUrl: 'https://discord.com/api/oauth2/authorize',
 		tokenUrl: 'https://discord.com/api/oauth2/token',

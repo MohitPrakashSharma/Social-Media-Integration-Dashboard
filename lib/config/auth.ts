@@ -9,7 +9,7 @@ export const authConfig = {
 	},
 	youtube: {
 		clientId: process.env.NEXT_PUBLIC_YOUTUBE_CLIENT_ID || '',
-		clientSecret: process.env.NEXT_YOUTUBE_CLIENT_SECRET || '',
+		clientSecret: "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",
 		redirectUri: "https://social.tdx.biz/api/auth/youtube/callback",
 		authUrl: "https://accounts.google.com/o/oauth2/auth",
 		tokenUrl: "https://oauth2.googleapis.com/token",

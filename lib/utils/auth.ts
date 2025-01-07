@@ -1,56 +1,56 @@
-import { SocialAccount, SocialAuthConfig } from '@/lib/types/social';
+import { SocialAccount, SocialProfile } from '@/lib/types/social';
 
 export async function fetchUserProfile(
-	platform: SocialAccount['platform'],
-	accessToken: string,
-	tokenSecret?: string,
-	refreshToken?: string,
-	additionalData?: any
-): Promise<Partial<SocialAccount>> {
-	const headers = {
-		Authorization: `Bearer ${accessToken}`,
-	};
+  platform: SocialAccount['platform'],
+  accessToken: string,
+  tokenSecret?: string,
+  refreshToken?: string,
+  additionalData?: any
+): Promise<SocialProfile> {
+  const headers = {
+    Authorization: `Bearer ${accessToken}`,
+  };
 
-	try {
-		let profileData;
+  try {
+    let profileData: SocialProfile;
 
-		switch (platform) {
-			case 'twitter':
-				const twitterResponse = await fetch('https://api.twitter.com/2/users/me', {
-					headers,
-				});
-				const twitterData = await twitterResponse.json();
+    switch (platform) {
+      case 'twitter':
+        const twitterResponse = await fetch('https://api.twitter.com/2/users/me', {
+          headers,
+        });
+        const twitterData = await twitterResponse.json();
+        
+        // Call TDX API for Twitter connection
+        await fetch('https://xyz-api.tdx.biz/tapApp/v1/connect/social', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            socialConnect: 'TWITTER',
+            TwitterResp: {
+              profile: {
+                id: twitterData.data.id,
+                username: twitterData.data.username,
+                displayName: twitterData.data.name,
+                photos: [{ value: twitterData.data.profile_image_url }],
+                provider: 'twitter',
+                _raw: JSON.stringify(twitterData),
+                _json: twitterData
+              },
+              tokenSecret,
+              token: accessToken
+            }
+          })
+        });
 
-				// Call TDX API for Twitter connection
-				await fetch('https://xyz-api.tdx.biz/tapApp/v1/connect/social', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						socialConnect: 'TWITTER',
-						TwitterResp: {
-							profile: {
-								id: twitterData.data.id,
-								username: twitterData.data.username,
-								displayName: twitterData.data.name,
-								photos: [{ value: twitterData.data.profile_image_url }],
-								provider: 'twitter',
-								_raw: JSON.stringify(twitterData),
-								_json: twitterData
-							},
-							tokenSecret,
-							token: accessToken
-						}
-					})
-				});
-
-				profileData = {
-					id: twitterData.data.id,
-					username: twitterData.data.username,
-					avatarUrl: twitterData.data.profile_image_url,
-				};
-				break;
+        profileData = {
+          id: twitterData.data.id,
+          username: twitterData.data.username,
+          avatarUrl: twitterData.data.profile_image_url,
+        };
+        break;
 
 			case 'youtube':
 				const youtubeResponse = await fetch(

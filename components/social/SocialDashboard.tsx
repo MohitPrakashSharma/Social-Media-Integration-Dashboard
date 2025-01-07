@@ -10,157 +10,172 @@ import { getProfileFromCookies } from '@/utility';
 import { fetchUserProfile } from '@/lib/utils/auth';
 
 export function SocialDashboard() {
-  const [accounts, setAccounts] = useState<Record<string, SocialAccount | null>>({
-    twitter: null,
-    youtube: null,
-    discord: null,
-  });
+	const [accounts, setAccounts] = useState<Record<string, SocialAccount | null>>({
+		twitter: null,
+		youtube: null,
+		discord: null,
+	});
 
-  const searchParams = useSearchParams();
-  const { toast } = useToast();
-  const platform = searchParams.get('platform');
+	const searchParams = useSearchParams();
+	const { toast } = useToast();
+	const platform = searchParams.get('platform');
+	const code = searchParams.get('code');
 
-  useEffect(() => {
-    const code = searchParams.get('code');
-    const error = searchParams.get('error');
+	useEffect(() => {
+		const success = searchParams.get('success');
+		const error = searchParams.get('error');
 
-    if (error || !code || !platform) {
-      if (error) {
-        toast({
-          title: 'Connection Failed',
-          description: error,
-          variant: 'destructive',
-        });
-      }
-      return;
-    }
+		if (success && platform) {
+			fetchProfile(platform as SocialAccount['platform']);
+			toast({
+				title: 'Connected Successfully',
+				description: `Your ${platform} account has been connected.`,
+			});
+		} else if (error) {
+			toast({
+				title: 'Connection Failed',
+				description: error,
+				variant: 'destructive',
+			});
+		}
+	}, [searchParams, toast, platform]);
 
-    const handleAuth = async () => {
-      try {
-        const config = authConfig[platform as keyof typeof authConfig];
-        const tokenResponse = await fetch(config.tokenUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            client_id: config.clientId,
-            client_secret: config.clientSecret,
-            code,
-            grant_type: 'authorization_code',
-            redirect_uri: config.redirectUri,
-          }),
-        });
+	useEffect(() => {
+		if (code && platform) {
+			handleAuth();
+		}
+	}, [code, platform]);
 
-        if (!tokenResponse.ok) {
-          throw new Error('Failed to exchange code for token');
-        }
+	const fetchProfile = async (platform: SocialAccount['platform']) => {
+		try {
+			const profile = await getProfileFromCookies(platform);
+			if (profile) {
+				setAccounts((prev) => ({
+					...prev,
+					[platform]: {
+						...profile,
+						platform,
+						isConnected: true,
+					},
+				}));
+			}
+		} catch (error) {
+			console.error('Failed to fetch profile:', error);
+		}
+	};
 
-        const tokens = await tokenResponse.json();
-        
-        // Fetch user profile and connect to TDX API
-        const userProfile = await fetchUserProfile(
-          platform as keyof typeof authConfig,
-          tokens.access_token,
-          tokens.token_secret, // For Twitter
-          tokens.refresh_token, // For YouTube and Discord
-          tokens // Additional token data
-        );
+	const handleAuth = async () => {
+		if (!platform || !code) return;
 
-        // Store tokens and profile in localStorage
-        localStorage.setItem(`${platform}_token`, tokens.access_token);
-        localStorage.setItem(`${platform}_profile`, JSON.stringify(userProfile));
+		try {
+			const config = authConfig[platform as keyof typeof authConfig];
+			const tokenResponse = await fetch(config.tokenUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: new URLSearchParams({
+					client_id: config.clientId,
+					client_secret: config.clientSecret,
+					code,
+					grant_type: 'authorization_code',
+					redirect_uri: config.redirectUri,
+				}),
+			});
 
-        // Update accounts state
-        setAccounts(prev => ({
-          ...prev,
-          [platform]: {
-            ...userProfile,
-            platform: platform as SocialAccount['platform'],
-            isConnected: true,
-          },
-        }));
+			if (!tokenResponse.ok) {
+				throw new Error('Failed to exchange code for token');
+			}
 
-        toast({
-          title: 'Connected Successfully',
-          description: `Your ${platform} account has been connected.`,
-        });
-      } catch (error: any) {
-        console.error('Auth callback error:', error);
-        toast({
-          title: 'Connection Failed',
-          description: error.message || 'Authentication failed',
-          variant: 'destructive',
-        });
-      }
-    };
+			const tokens = await tokenResponse.json();
 
-    handleAuth();
-  }, [searchParams, toast]);
+			// Fetch user profile and connect to TDX API
+			const userProfile = await fetchUserProfile(
+				platform as SocialAccount['platform'],
+				tokens.access_token,
+				tokens.token_secret,
+				tokens.refresh_token,
+				tokens
+			);
 
-  const handleConnect = async (platform: SocialAccount['platform']) => {
-    const config = authConfig[platform];
-    const params = new URLSearchParams({
-      client_id: config.clientId,
-      redirect_uri: config.redirectUri,
-      response_type: 'code',
-      scope: config.scope.join(' '),
-      state: platform,
-    });
+			// Create full social account object
+			const socialAccount: SocialAccount = {
+				...userProfile,
+				platform: platform as SocialAccount['platform'],
+				isConnected: true,
+			};
 
-    window.location.href = `${config.authUrl}?${params.toString()}`;
-  };
+			// Store tokens and profile in localStorage
+			localStorage.setItem(`${platform}_token`, tokens.access_token);
+			localStorage.setItem(`${platform}_profile`, JSON.stringify(socialAccount));
 
-  const handleDisconnect = async (platform: SocialAccount['platform']) => {
-    try {
-      await fetch(`/api/auth/${platform}/disconnect`, { method: 'POST' });
-      localStorage.removeItem(`${platform}_token`);
-      localStorage.removeItem(`${platform}_profile`);
-      setAccounts(prev => ({ ...prev, [platform]: null }));
-      
-      toast({
-        title: 'Disconnected Successfully',
-        description: `Your ${platform} account has been disconnected.`,
-      });
-    } catch (error) {
-      console.error('Failed to disconnect:', error);
-      toast({
-        title: 'Disconnection Failed',
-        description: `Failed to disconnect ${platform} account.`,
-        variant: 'destructive',
-      });
-      throw error;
-    }
-  };
+			// Update accounts state
+			setAccounts(prev => ({
+				...prev,
+				[platform]: socialAccount,
+			}));
 
-  // Fetch initial profiles on mount
-  useEffect(() => {
-    Object.keys(accounts).forEach((platform) => {
-      const profile = localStorage.getItem(`${platform}_profile`);
-      if (profile) {
-        setAccounts(prev => ({
-          ...prev,
-          [platform]: {
-            ...JSON.parse(profile),
-            platform: platform as SocialAccount['platform'],
-            isConnected: true,
-          },
-        }));
-      }
-    });
-  }, []);
+			toast({
+				title: 'Connected Successfully',
+				description: `Your ${platform} account has been connected.`,
+			});
+		} catch (error: any) {
+			console.error('Auth callback error:', error);
+			toast({
+				title: 'Connection Failed',
+				description: error.message || 'Authentication failed',
+				variant: 'destructive',
+			});
+		}
+	};
 
-  return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {Object.keys(accounts).map((platform) => (
-        <SocialCard
-          key={platform}
-          platform={platform as SocialAccount['platform']}
-          account={accounts[platform]}
-          onConnect={() => handleConnect(platform as SocialAccount['platform'])}
-          onDisconnect={() => handleDisconnect(platform as SocialAccount['platform'])}
-        />
-      ))}
-    </div>
-  );
+	const handleConnect = async (platform: SocialAccount['platform']) => {
+		const config = authConfig[platform];
+		const params = new URLSearchParams({
+			client_id: config.clientId,
+			redirect_uri: config.redirectUri,
+			response_type: 'code',
+			scope: config.scope.join(' '),
+			state: platform,
+		});
+
+		window.location.href = `${config.authUrl}?${params.toString()}`;
+	};
+
+	const handleDisconnect = async (platform: SocialAccount['platform']) => {
+		try {
+			await fetch(`/api/auth/${platform}/disconnect`, { method: 'POST' });
+			setAccounts((prev) => ({ ...prev, [platform]: null }));
+			localStorage.removeItem(`${platform}_token`);
+			localStorage.removeItem(`${platform}_profile`);
+			toast({
+				title: 'Disconnected',
+				description: `Your ${platform} account has been disconnected.`,
+			});
+		} catch (error) {
+			console.error('Failed to disconnect:', error);
+			throw error;
+		}
+	};
+
+	// Fetch initial profiles on mount
+	useEffect(() => {
+		Object.keys(accounts).forEach((platform) => {
+			fetchProfile(platform as SocialAccount['platform']);
+		});
+	}, []);
+
+	return (
+		<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+			{Object.keys(accounts).map((platform) => (
+				<SocialCard
+					key={platform}
+					platform={platform as SocialAccount['platform']}
+					account={accounts[platform]}
+					onConnect={() => handleConnect(platform as SocialAccount['platform'])}
+					onDisconnect={() => handleDisconnect(platform as SocialAccount['platform'])}
+				/>
+			))}
+		</div>
+	);
 }

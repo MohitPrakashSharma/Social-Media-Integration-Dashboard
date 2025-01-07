@@ -8,8 +8,8 @@ export const authConfig = {
 		scope: ['tweet.read', 'users.read'],
 	},
 	youtube: {
-		clientId: process.env.NEXT_PUBLIC_YOUTUBE_CLIENT_ID,
-		clientSecret: process.env.YOUTUBE_CLIENT_SECRET,
+		clientId: process.env.NEXT_PUBLIC_YOUTUBE_CLIENT_ID || '',
+		clientSecret: process.env.YOUTUBE_CLIENT_SECRET || '',
 		redirectUri: "https://social.tdx.biz/api/auth/youtube/callback",
 		authUrl: "https://accounts.google.com/o/oauth2/auth",
 		tokenUrl: "https://oauth2.googleapis.com/token",

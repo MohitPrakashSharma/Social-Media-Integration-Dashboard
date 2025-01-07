@@ -17,7 +17,7 @@ export const authConfig = {
 	},
 	discord: {
 		clientId: process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '',
-		clientSecret: process.env.NEXT_DISCORD_CLIENT_SECRET || 'BVCPexjONnvtMIdD0sMntDrAmRUyxwS_',
+		clientSecret: process.env.NEXT_DISCORD_CLIENT_SECRET || 'hd5hFlypdBXOKw0wTx2fEQDDKLezIz8qYSabktlB6Ei6M4OOwN',
 		redirectUri: 'https://social.tdx.biz/api/auth/discord/callback',
 		authUrl: 'https://discord.com/api/oauth2/authorize',
 		tokenUrl: 'https://discord.com/api/oauth2/token',

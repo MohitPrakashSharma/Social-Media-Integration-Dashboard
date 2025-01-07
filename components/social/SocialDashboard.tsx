@@ -133,10 +133,15 @@ export function SocialDashboard() {
 		const config = authConfig[platform];
 		if (platform === 'twitter') {
 			const response = await fetch('/api/auth/twitter/request-token');
-			const { oauth_token } = await response.json();
-			window.location.href = `${config.authUrl}?oauth_token=${oauth_token}`;
+			const data = await response.json();
+			
+			if (data.error) {
+			  throw new Error(data.error);
+			}
+			
+			window.location.href = `${authConfig.twitter.authUrl}?oauth_token=${data.oauth_token}`;
 			return;
-		}
+		  }
 		const params = new URLSearchParams({
 			client_id: config.clientId,
 			redirect_uri: config.redirectUri,

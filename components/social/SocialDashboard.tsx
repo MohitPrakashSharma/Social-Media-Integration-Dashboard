@@ -130,27 +130,37 @@ export function SocialDashboard() {
 	};
 
 	const handleConnect = async (platform: SocialAccount['platform']) => {
-		const config = authConfig[platform];
-		if (platform === 'twitter') {
-			const response = await fetch('/api/auth/twitter/request-token');
-			const data = await response.json();
-			
-			if (data.error) {
-			  throw new Error(data.error);
-			}
-			
-			window.location.href = `${authConfig.twitter.authUrl}?oauth_token=${data.oauth_token}`;
-			return;
-		  }
-		const params = new URLSearchParams({
-			client_id: config.clientId,
-			redirect_uri: config.redirectUri,
-			response_type: 'code',
-			scope: config.scope.join(' '),
-			state: platform,
-		});
+		try {
+			if (platform === 'twitter') {
+				const response = await fetch('/api/auth/twitter/request-token');
+				const data = await response.json();
 
-		window.location.href = `${config.authUrl}?${params.toString()}`;
+				if (data.error) {
+					throw new Error(data.error);
+				}
+
+				window.location.href = `${authConfig.twitter.authUrl}?oauth_token=${data.oauth_token}`;
+				return;
+			}
+
+			// For other platforms
+			const config = authConfig[platform];
+			const params = new URLSearchParams({
+				client_id: config.clientId,
+				redirect_uri: config.redirectUri,
+				response_type: 'code',
+				scope: config.scope.join(' '),
+				state: platform,
+			});
+
+			window.location.href = `${config.authUrl}?${params.toString()}`;
+		} catch (error: any) {
+			toast({
+				title: 'Connection Failed',
+				description: error.message || 'Failed to connect to platform',
+				variant: 'destructive',
+			});
+		}
 	};
 
 	const handleDisconnect = async (platform: SocialAccount['platform']) => {

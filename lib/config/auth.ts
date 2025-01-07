@@ -5,7 +5,7 @@ export const authConfig = {
 		redirectUri: 'https://social.tdx.biz/api/auth/twitter/callback',
 		authUrl: 'https://api.twitter.com/oauth/authorize',
 		requestTokenUrl: 'https://api.twitter.com/oauth/request_token',
-		accessTokenUrl: 'https://api.twitter.com/oauth/access_token',
+		tokenUrl: 'https://api.twitter.com/oauth/access_token',
 		scope: ['tweet.read', 'users.read', 'offline.access'],
 	},
 	youtube: {

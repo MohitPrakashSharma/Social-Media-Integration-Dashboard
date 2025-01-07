@@ -3,62 +3,6 @@ import OAuth from 'oauth-1.0a';
 import crypto from 'crypto';
 
 export async function GET() {
-<<<<<<< HEAD
-    try {
-        const oauth = new OAuth({
-            consumer: {
-                key: authConfig.twitter.clientId,
-                secret: authConfig.twitter.clientSecret,
-            },
-            signature_method: 'HMAC-SHA1',
-            hash_function(base_string, key) {
-                return crypto
-                    .createHmac('sha1', key)
-                    .update(base_string)
-                    .digest('base64');
-            },
-        });
-
-        const requestData = {
-            url: authConfig.twitter.requestTokenUrl,
-            method: 'POST',
-            data: {
-                oauth_callback: authConfig.twitter.redirectUri,
-            },
-        };
-
-        const headers = oauth.toHeader(oauth.authorize(requestData));
-
-        const response = await fetch(requestData.url, {
-            method: 'POST',
-            headers: {
-                ...headers,
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams(requestData.data),
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Twitter API error:', errorText);
-            throw new Error('Failed to get request token');
-        }
-
-        const data = await response.text();
-        const parsed = new URLSearchParams(data);
-
-        return Response.json({
-            oauth_token: parsed.get('oauth_token'),
-            oauth_token_secret: parsed.get('oauth_token_secret'),
-        });
-    } catch (error) {
-        console.error('Request token error:', error);
-        return Response.json(
-            { error: 'Failed to get request token' },
-            { status: 500 }
-        );
-    }
-=======
   try {
     const oauth = new OAuth({
       consumer: {
@@ -75,8 +19,11 @@ export async function GET() {
     });
 
     const requestData = {
-      url: 'https://api.twitter.com/oauth/request_token',
+      url: authConfig.twitter.requestTokenUrl,
       method: 'POST',
+      data: {
+        oauth_callback: authConfig.twitter.redirectUri,
+      },
     };
 
     const headers = oauth.toHeader(oauth.authorize(requestData));
@@ -87,9 +34,12 @@ export async function GET() {
         ...headers,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
+      body: new URLSearchParams(requestData.data),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Twitter API error:', errorText);
       throw new Error('Failed to get request token');
     }
 
@@ -107,5 +57,4 @@ export async function GET() {
       { status: 500 }
     );
   }
->>>>>>> 96249efc8e2df48cb6b5456a3383d4cb3355f0f4
 }

@@ -55,6 +55,7 @@ export function SocialDashboard() {
 			(async () => {
 				try {
 					const config = authConfig[platform as keyof typeof authConfig];
+					console.log("🚀 ~ config:", config)
 					const tokenResponse = await fetch(config.tokenUrl, {
 						method: 'POST',
 						headers: {

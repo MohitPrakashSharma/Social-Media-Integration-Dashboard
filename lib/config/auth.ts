@@ -1,7 +1,7 @@
 export const authConfig = {
 	twitter: {
 		clientId: process.env.NEXT_PUBLIC_TWITTER_CLIENT_ID || '',
-		clientSecret: process.env.NEXT_TWITTER_CLIENT_SECRET || '',
+		clientSecret: process.env.NEXT_TWITTER_CLIENT_SECRET || 'hd5hFlypdBXOKw0wTx2fEQDDKLezIz8qYSabktlB6Ei6M4OOwN',
 		redirectUri: 'https://social.tdx.biz/api/auth/twitter/callback',
 		authUrl: 'https://twitter.com/i/oauth2/authorize',
 		tokenUrl: 'https://api.twitter.com/2/oauth2/token',
@@ -17,7 +17,7 @@ export const authConfig = {
 	},
 	discord: {
 		clientId: process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '',
-		clientSecret: process.env.NEXT_DISCORD_CLIENT_SECRET || '',
+		clientSecret: process.env.NEXT_DISCORD_CLIENT_SECRET || 'BVCPexjONnvtMIdD0sMntDrAmRUyxwS_',
 		redirectUri: 'https://social.tdx.biz/api/auth/discord/callback',
 		authUrl: 'https://discord.com/api/oauth2/authorize',
 		tokenUrl: 'https://discord.com/api/oauth2/token',

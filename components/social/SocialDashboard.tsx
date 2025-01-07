@@ -131,6 +131,12 @@ export function SocialDashboard() {
 
 	const handleConnect = async (platform: SocialAccount['platform']) => {
 		const config = authConfig[platform];
+		if (platform === 'twitter') {
+			const response = await fetch('/api/auth/twitter/request-token');
+			const { oauth_token } = await response.json();
+			window.location.href = `${config.authUrl}?oauth_token=${oauth_token}`;
+			return;
+		}
 		const params = new URLSearchParams({
 			client_id: config.clientId,
 			redirect_uri: config.redirectUri,

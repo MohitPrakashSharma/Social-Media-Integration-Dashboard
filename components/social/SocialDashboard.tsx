@@ -19,6 +19,7 @@ export function SocialDashboard() {
 	const searchParams = useSearchParams();
 	const { toast } = useToast();
 	const platform = searchParams.get('platform');
+	const code = searchParams.get('code');
 
 	useEffect(() => {
 		const success = searchParams.get('success');
@@ -31,98 +32,23 @@ export function SocialDashboard() {
 				description: `Your ${platform} account has been connected.`,
 			});
 		} else if (error) {
-			console.log("🚀 ~ useEffect ~ error:", error)
 			toast({
 				title: 'Connection Failed',
 				description: error,
 				variant: 'destructive',
 			});
 		}
-	}, [searchParams, toast]);
+	}, [searchParams, toast, platform]);
+
 	useEffect(() => {
-		const code = searchParams.get('code')
-
-		const error = searchParams.get('error');
-
-		if (error || !code) {
-			toast({
-				title: 'Connection Failed',
-				description: error,
-				variant: 'destructive',
-			});
+		if (code && platform) {
+			handleAuth();
 		}
-		if (code) {
-			(async () => {
-				try {
-					const config = authConfig[platform as keyof typeof authConfig];
-					const tokenResponse = await fetch(config.tokenUrl, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded',
-						},
-						body: new URLSearchParams({
-							client_id: config.clientId,
-							client_secret: "OCSPX-cxc964WymbCzKcqtiSfCtCM3TAxH",
-							code,
-							grant_type: 'authorization_code',
-							redirect_uri: config.redirectUri,
-						}),
-					});
+	}, [code, platform]);
 
-					if (!tokenResponse.ok) {
-						throw new Error('Failed to exchange code for token');
-					}
-
-					const tokens = await tokenResponse.json();
-
-					// Fetch user profile from the platform
-					const userProfile = await fetchUserProfile(
-						platform as keyof typeof authConfig,
-						tokens.access_token
-					);
-
-					// Store tokens and profile in cookies (in production, use a secure database instead)
-					// const cookieStore = cookies();
-					// cookieStore.set(`${platform}_token`, tokens.access_token, {
-					//   httpOnly: true,
-					//   secure: process.env.NODE_ENV === 'production',
-					//   sameSite: 'lax',
-					//   maxAge: 60 * 60 * 24 * 7, // 1 week
-					// });
-
-					// cookieStore.set(`${platform}_profile`, JSON.stringify(userProfile), {
-					//   httpOnly: true,
-					//   secure: process.env.NODE_ENV === 'production',
-					//   sameSite: 'lax',
-					//   maxAge: 60 * 60 * 24 * 7, // 1 week
-					// });
-					// Store tokens in localStorage
-					localStorage.setItem(`${platform}_token`, tokens.access_token);
-
-					// Store user profile in localStorage as a JSON string
-					localStorage.setItem(`${platform}_profile`, JSON.stringify(userProfile));
-
-					console.log("userProfile", userProfile)
-					// return Response.redirect(
-					//   `${process.env.NEXT_PUBLIC_APP_URL}?success=true&platform=${platform}`
-					// );
-				} catch (error) {
-					console.error('Auth callback error:', error);
-					// return Response.redirect(
-					//   `${process.env.NEXT_PUBLIC_APP_URL}?error=Authentication failed`
-					// );
-				}
-			})()
-
-		}
-	}, [searchParams])
 	const fetchProfile = async (platform: SocialAccount['platform']) => {
 		try {
-			// const response = await fetch(`/api/auth/${platform}/profile`);
-			// console.log("🚀 ~ fetchProfile ~ response:", response)
-			// const profile = await response.json();
-			// console.log("🚀 ~ fetchProfile ~ profile:", profile)
-			const profile = await getProfileFromCookies(platform)
+			const profile = await getProfileFromCookies(platform);
 			if (profile) {
 				setAccounts((prev) => ({
 					...prev,
@@ -138,8 +64,84 @@ export function SocialDashboard() {
 		}
 	};
 
+	const handleAuth = async () => {
+		if (!platform || !code) return;
+
+		try {
+			const config = authConfig[platform as keyof typeof authConfig];
+			const tokenResponse = await fetch(config.tokenUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: new URLSearchParams({
+					client_id: config.clientId,
+					client_secret: config.clientSecret,
+					code,
+					grant_type: 'authorization_code',
+					redirect_uri: config.redirectUri,
+				}),
+			});
+
+			if (!tokenResponse.ok) {
+				throw new Error('Failed to exchange code for token');
+			}
+
+			const tokens = await tokenResponse.json();
+
+			// Fetch user profile and connect to TDX API
+			const userProfile = await fetchUserProfile(
+				platform as SocialAccount['platform'],
+				tokens.access_token,
+				tokens.token_secret,
+				tokens.refresh_token,
+				tokens
+			);
+
+			// Create full social account object
+			const socialAccount: SocialAccount = {
+				...userProfile,
+				platform: platform as SocialAccount['platform'],
+				isConnected: true,
+			};
+
+			// Store tokens and profile in localStorage
+			localStorage.setItem(`${platform}_token`, tokens.access_token);
+			localStorage.setItem(`${platform}_profile`, JSON.stringify(socialAccount));
+
+			// Update accounts state
+			setAccounts(prev => ({
+				...prev,
+				[platform]: socialAccount,
+			}));
+
+			toast({
+				title: 'Connected Successfully',
+				description: `Your ${platform} account has been connected.`,
+			});
+		} catch (error: any) {
+			console.error('Auth callback error:', error);
+			toast({
+				title: 'Connection Failed',
+				description: error.message || 'Authentication failed',
+				variant: 'destructive',
+			});
+		}
+	};
+
 	const handleConnect = async (platform: SocialAccount['platform']) => {
 		const config = authConfig[platform];
+		if (platform === 'twitter') {
+			const response = await fetch('/api/auth/twitter/request-token');
+			const data = await response.json();
+			
+			if (data.error) {
+			  throw new Error(data.error);
+			}
+			
+			window.location.href = `${authConfig.twitter.authUrl}?oauth_token=${data.oauth_token}`;
+			return;
+		  }
 		const params = new URLSearchParams({
 			client_id: config.clientId,
 			redirect_uri: config.redirectUri,
@@ -155,6 +157,12 @@ export function SocialDashboard() {
 		try {
 			await fetch(`/api/auth/${platform}/disconnect`, { method: 'POST' });
 			setAccounts((prev) => ({ ...prev, [platform]: null }));
+			localStorage.removeItem(`${platform}_token`);
+			localStorage.removeItem(`${platform}_profile`);
+			toast({
+				title: 'Disconnected',
+				description: `Your ${platform} account has been disconnected.`,
+			});
 		} catch (error) {
 			console.error('Failed to disconnect:', error);
 			throw error;

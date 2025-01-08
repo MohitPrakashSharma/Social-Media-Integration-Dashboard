@@ -10,12 +10,15 @@ interface AuthContextType {
 	login: (telegramUser: TelegramUser) => Promise<void>;
 	logout: () => void;
 	isLoggingIn: boolean;
+	token:string
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [user, setUser] = useState<User | null>(null);
+	const [token, setToken] = useState("");
+
 	const { toast } = useToast();
 
 	const handleLogin = async (telegramUser: TelegramUser) => {
@@ -28,12 +31,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		});
 
 		const data = await response.json();
+		console.log("🚀 ~ handleLogin ~ data:", data)
 
 		if (data.error) {
 			throw new Error(data.message);
 		}
 
-		setUser(data.data);
+		// setUser(data.data);
 		localStorage.setItem('user', JSON.stringify(data.data));
 		toast({
 			title: 'Login Successful',
@@ -44,16 +48,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const { execute: debouncedLogin, isExecuting: isLoggingIn } = useDebounce(handleLogin, 1000);
 
 	const login = async (telegramUser: TelegramUser) => {
-		try {
-			await debouncedLogin(telegramUser);
-		} catch (error: any) {
-			toast({
-				title: 'Login Failed',
-				description: error.message,
-				variant: 'destructive',
-			});
-			throw error;
-		}
+		setToken(telegramUser.token)
+		localStorage.setItem('user', JSON.stringify(telegramUser));
+
+		// try {
+		// 	await debouncedLogin(telegramUser);
+		// } catch (error: any) {
+		// 	toast({
+		// 		title: 'Login Failed',
+		// 		description: error.message,
+		// 		variant: 'destructive',
+		// 	});
+		// 	throw error;
+		// }
 	};
 
 	const logout = () => {
@@ -73,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	}, []);
 
 	return (
-		<AuthContext.Provider value={{ user, login, logout, isLoggingIn }}>
+		<AuthContext.Provider value={{ user, login, logout, isLoggingIn ,token}}>
 			{children}
 		</AuthContext.Provider>
 	);

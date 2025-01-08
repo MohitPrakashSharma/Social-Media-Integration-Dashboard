@@ -22,7 +22,7 @@ export default function Home() {
 					const jsonString = atob(userParam);
 					const telegramUser: TelegramUser = JSON.parse(jsonString);
 
-					if (!telegramUser.telegramId || !telegramUser.userName || !telegramUser.name) {
+					if (!telegramUser.telegramId ) {
 						throw new Error('Invalid user data');
 					}
 

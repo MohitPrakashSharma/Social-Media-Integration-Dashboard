@@ -21,7 +21,7 @@ export function SocialDashboard() {
 	const { toast } = useToast();
 	const platform = searchParams.get('platform');
 	const code = searchParams.get('code');
-	const {  user } = useAuth();
+	const {  user ,token} = useAuth();
 
 	useEffect(() => {
 		const success = searchParams.get('success');
@@ -98,7 +98,8 @@ export function SocialDashboard() {
 				tokens.token_secret,
 				tokens.refresh_token,
 				tokens,
-				user
+				user,
+				token
 			);
 
 			// Create full social account object

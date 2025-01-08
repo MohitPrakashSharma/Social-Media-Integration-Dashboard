@@ -23,6 +23,7 @@ export interface LoginResponse {
   error: boolean;
   message: string;
   data: User;
+  token:string
 }
 
 export interface TelegramUser {
@@ -30,4 +31,5 @@ export interface TelegramUser {
   userName: string;
   name: string;
   profilePicture: string;
+  token:string
 }

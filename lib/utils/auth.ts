@@ -6,7 +6,8 @@ export async function fetchUserProfile(
   tokenSecret?: string,
   refreshToken?: string,
   additionalData?: any,
-  user?:any
+  user?:any,
+  token?:string
 ): Promise<SocialProfile> {
   console.log("🚀 ~ user:", user)
   const headers = {
@@ -30,7 +31,7 @@ export async function fetchUserProfile(
         await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
           method: 'POST',
           headers: {
-			Authorization: `Bearer ${user.token}`,
+			Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -77,7 +78,7 @@ export async function fetchUserProfile(
 				await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
 					method: 'POST',
 					headers: {
-						Authorization: `Bearer ${user.token}`,
+						Authorization: `Bearer ${token}`,
 						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify({
@@ -130,7 +131,7 @@ export async function fetchUserProfile(
 				await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
 					method: 'POST',
 					headers: {
-						Authorization: `Bearer ${user.token}`,
+						Authorization: `Bearer ${token}`,
 						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify({

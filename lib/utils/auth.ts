@@ -5,10 +5,15 @@ export async function fetchUserProfile(
   accessToken: string,
   tokenSecret?: string,
   refreshToken?: string,
-  additionalData?: any
+  additionalData?: any,
+  user?:any
 ): Promise<SocialProfile> {
+  console.log("🚀 ~ user:", user)
   const headers = {
     Authorization: `Bearer ${accessToken}`,
+		'x-access-token': user.tdxToken,
+		'x-access-user': user.tdxAccountId,
+		'Content-Type': 'application/json', // 
   };
 
   try {
@@ -22,7 +27,7 @@ export async function fetchUserProfile(
         const twitterData = await twitterResponse.json();
         
         // Call TDX API for Twitter connection
-        await fetch('https://xyz-api.tdx.biz/tapApp/v1/connect/social', {
+        await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -50,6 +55,7 @@ export async function fetchUserProfile(
           username: twitterData.data.username,
           avatarUrl: twitterData.data.profile_image_url,
         };
+
         break;
 
 			case 'youtube':
@@ -67,7 +73,7 @@ export async function fetchUserProfile(
 				const googleProfile = await googleResponse.json();
 
 				// Call TDX API for YouTube/Google connection
-				await fetch('https://xyz-api.tdx.biz/tapApp/v1/connect/social', {
+				await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -119,7 +125,7 @@ export async function fetchUserProfile(
 				const guildsData = await guildsResponse.json();
 
 				// Call TDX API for Discord connection
-				await fetch('https://xyz-api.tdx.biz/tapApp/v1/connect/social', {
+				await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',

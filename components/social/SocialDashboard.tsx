@@ -8,6 +8,7 @@ import { authConfig } from '@/lib/config/auth';
 import { useToast } from '@/hooks/use-toast';
 import { getProfileFromCookies } from '@/utility';
 import { fetchUserProfile } from '@/lib/utils/auth';
+import { useAuth } from '@/lib/context/auth-context';
 
 export function SocialDashboard() {
 	const [accounts, setAccounts] = useState<Record<string, SocialAccount | null>>({
@@ -20,6 +21,7 @@ export function SocialDashboard() {
 	const { toast } = useToast();
 	const platform = searchParams.get('platform');
 	const code = searchParams.get('code');
+	const {  user } = useAuth();
 
 	useEffect(() => {
 		const success = searchParams.get('success');
@@ -95,7 +97,8 @@ export function SocialDashboard() {
 				tokens.access_token,
 				tokens.token_secret,
 				tokens.refresh_token,
-				tokens
+				tokens,
+				user
 			);
 
 			// Create full social account object

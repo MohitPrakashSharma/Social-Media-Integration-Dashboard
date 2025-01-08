@@ -32,6 +32,7 @@ export async function fetchUserProfile(
           method: 'POST',
           headers: {
 			Authorization: `Bearer ${user.token}`,
+			"appid" :user.appId,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -79,6 +80,7 @@ export async function fetchUserProfile(
 					method: 'POST',
 					headers: {
 						Authorization: `Bearer ${user.token}`,
+						"appid" :user.appId,
 						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify({
@@ -133,6 +135,7 @@ export async function fetchUserProfile(
 					headers: {
 						Authorization: `Bearer ${user.token}`,
 						'Content-Type': 'application/json',
+						"appid" :user.appId,
 					},
 					body: JSON.stringify({
 						socialConnect: 'DISCORD',

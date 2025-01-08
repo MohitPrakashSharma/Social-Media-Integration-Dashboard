@@ -11,9 +11,9 @@ export async function fetchUserProfile(
   console.log("🚀 ~ user:", user)
   const headers = {
     Authorization: `Bearer ${accessToken}`,
-		'x-access-token': user.tdxToken,
-		'x-access-user': user.tdxAccountId,
-		'Content-Type': 'application/json', // 
+		// 'x-access-token': user.tdxToken,
+		// 'x-access-user': user.tdxAccountId,
+		// 'Content-Type': 'application/json', // 
   };
 
   try {

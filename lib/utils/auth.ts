@@ -31,7 +31,7 @@ export async function fetchUserProfile(
         await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
           method: 'POST',
           headers: {
-			Authorization: `Bearer ${token}`,
+			Authorization: `Bearer ${user.token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -78,7 +78,7 @@ export async function fetchUserProfile(
 				await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
 					method: 'POST',
 					headers: {
-						Authorization: `Bearer ${token}`,
+						Authorization: `Bearer ${user.token}`,
 						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify({
@@ -131,7 +131,7 @@ export async function fetchUserProfile(
 				await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
 					method: 'POST',
 					headers: {
-						Authorization: `Bearer ${token}`,
+						Authorization: `Bearer ${user.token}`,
 						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify({

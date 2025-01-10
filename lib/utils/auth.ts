@@ -67,7 +67,8 @@ export async function fetchUserProfile(
 					{ headers }
 				);
 				const youtubeData = await youtubeResponse.json();
-				const channel = youtubeData.items[0];
+				console.log("🚀 ~ youtubeData:", youtubeData)
+				const channel = youtubeData?.items?.[0]||youtubeData.items;
 
 				// Get user profile from Google
 				const googleResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {

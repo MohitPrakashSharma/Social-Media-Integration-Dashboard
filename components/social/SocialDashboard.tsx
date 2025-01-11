@@ -34,11 +34,11 @@ export function SocialDashboard() {
 				description: `Your ${platform} account has been connected.`,
 			});
 		} else if (error) {
-			toast({
-				title: 'Connection Failed',
-				description: error,
-				variant: 'destructive',
-			});
+			// toast({
+			// 	title: 'Connection Failed',
+			// 	description: error,
+			// 	variant: 'destructive',
+			// });
 		}
 	}, [searchParams, toast, platform]);
 

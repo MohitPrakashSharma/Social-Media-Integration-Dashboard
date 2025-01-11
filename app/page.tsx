@@ -67,9 +67,7 @@ export default function Home() {
 		<main className="container mx-auto px-4 py-8">
 			<div className="mb-8 text-center">
 				<h1 className="text-4xl font-bold tracking-tight">Welcome, {user.name}!</h1>
-				<p className="mt-2 text-lg text-muted-foreground">
-					Level {user.level} • {user.points} Points
-				</p>
+				
 			</div>
 			<SocialDashboard />
 		</main>

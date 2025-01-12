@@ -93,12 +93,13 @@ export function SocialCard({ platform, account, loading = false, onConnect, onDi
 								variant="destructive"
 								className="w-full"
 								onClick={handleDisconnect}
-								disabled={authState.loading}
+								disabled={true}
+								
 							>
 								{authState.loading ? (
 									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 								) : (
-									'Disconnect'
+									'Connected'
 								)}
 							</Button>
 						</>

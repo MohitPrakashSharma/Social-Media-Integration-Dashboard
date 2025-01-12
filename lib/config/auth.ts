@@ -5,7 +5,7 @@ export const authConfig = {
 		redirectUri: 'https://social.tdx.biz/api/auth/twitter/callback',
 		authUrl: 'https://api.twitter.com/oauth/authenticate',
 		requestTokenUrl: 'https://api.twitter.com/oauth/request_token',
-		tokenUrl: 'https://api.twitter.com/oauth/authenticate?oauth_token',
+		tokenUrl: 'https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true',
 		
 		scope: ['tweet.read', 'users.read', 'offline.access'],
 	},

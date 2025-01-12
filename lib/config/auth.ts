@@ -3,9 +3,10 @@ export const authConfig = {
 		clientId: process.env.NEXT_PUBLIC_TWITTER_CONSUMER_KEY || 'HaTwg5xZ3zxeFPdZJj1IaxX8s',
 		clientSecret: process.env.TWITTER_CONSUMER_SECRET || 'hd5hFlypdBXOKw0wTx2fEQDDKLezIz8qYSabktlB6Ei6M4OOwN',
 		redirectUri: 'https://social.tdx.biz/api/auth/twitter/callback',
-		authUrl: 'https://api.twitter.com/oauth/authorize',
+		authUrl: 'https://api.twitter.com/oauth/authenticate',
 		requestTokenUrl: 'https://api.twitter.com/oauth/request_token',
 		tokenUrl: 'https://api.twitter.com/oauth/authenticate?oauth_token',
+		
 		scope: ['tweet.read', 'users.read', 'offline.access'],
 	},
 	youtube: {

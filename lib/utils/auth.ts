@@ -1,3 +1,4 @@
+import { toast } from '@/hooks/use-toast';
 import { SocialAccount, SocialProfile } from '@/lib/types/social';
 
 export async function fetchUserProfile(
@@ -28,7 +29,7 @@ export async function fetchUserProfile(
         const twitterData = await twitterResponse.json();
         
         // Call TDX API for Twitter connection
-        await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
+      let socialConnectTwitter = await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
           method: 'POST',
           headers: {
 			Authorization: `Bearer ${user.token}`,
@@ -52,7 +53,12 @@ export async function fetchUserProfile(
             }
           })
         });
-
+		if (!socialConnectTwitter.ok) {
+			const errorData = await socialConnectTwitter.json();
+			throw new Error(
+			  `Social connect API failed: ${errorData.message || 'Unknown error occurred'}`
+			);
+		  }
         profileData = {
           id: twitterData.data.id,
           username: twitterData.data.username,
@@ -77,7 +83,7 @@ export async function fetchUserProfile(
 				const googleProfile = await googleResponse.json();
 
 				// Call TDX API for YouTube/Google connection
-				await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
+				const socialConnectyoutube=await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
 					method: 'POST',
 					headers: {
 						Authorization: `Bearer ${user.token}`,
@@ -110,7 +116,12 @@ export async function fetchUserProfile(
 						}
 					})
 				});
-
+				if (!socialConnectyoutube.ok) {
+					const errorData = await socialConnectyoutube.json();
+					throw new Error(
+					  `Social connect API failed: ${errorData.message || 'Unknown error occurred'}`
+					);
+				  }
 				profileData = {
 					id: channel.id,
 					username: channel.snippet.title,
@@ -131,7 +142,7 @@ export async function fetchUserProfile(
 				const guildsData = await guildsResponse.json();
 
 				// Call TDX API for Discord connection
-				await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
+			 const socialConnectDiscord=	await fetch('https://stage-api.tdx.biz/game/api/v1/users/connect/social', {
 					method: 'POST',
 					headers: {
 						Authorization: `Bearer ${user.token}`,
@@ -157,7 +168,12 @@ export async function fetchUserProfile(
 						}
 					})
 				});
-
+				if (!socialConnectDiscord.ok) {
+					const errorData = await socialConnectDiscord.json();
+					throw new Error(
+					  `Social connect API failed: ${errorData.message || 'Unknown error occurred'}`
+					);
+				  }
 				profileData = {
 					id: discordData.id,
 					username: discordData.username,
@@ -171,6 +187,12 @@ export async function fetchUserProfile(
 
 		return profileData;
 	} catch (error) {
+		toast({
+			title: 'Connection Failed',
+			//@ts-ignore
+			description: error.message || 'Authentication failed',
+			variant: 'destructive',
+		});
 		console.error(`Error fetching ${platform} profile:`, error);
 		throw error;
 	}

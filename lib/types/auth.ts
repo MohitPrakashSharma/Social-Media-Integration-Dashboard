@@ -16,6 +16,7 @@ export interface User {
   totalEnergyRewardMoves: number;
   profilePicture: string;
   userId: string;
+  platform: string
 }
 
 export interface LoginResponse {

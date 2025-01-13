@@ -189,10 +189,9 @@ export function SocialDashboard() {
 			fetchProfile(platform as SocialAccount['platform']);
 		});
 	}, []);
-
 	return (
 		<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-			{Object.keys(accounts).map((platform) => (
+			{Object.keys(accounts).filter((x)=>x===user?.platform).map((platform) => (
 				<SocialCard
 					key={platform}
 					platform={platform as SocialAccount['platform']}
